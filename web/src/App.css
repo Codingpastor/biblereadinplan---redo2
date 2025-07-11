@@ -406,6 +406,25 @@ body {
   overflow: hidden;
 }
 
+/* Footer text styling - Centered */
+.footer {
+  text-align: center;
+  padding: 0.75rem 1rem;
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  background: linear-gradient(135deg, var(--surface-light) 0%, var(--surface-hover) 100%);
+  border-top: 1px solid var(--border);
+  font-weight: 500;
+  font-style: italic;
+}
+
+@media (min-width: 768px) {
+  .footer {
+    font-size: 1.2rem;
+    padding: 1rem;
+  }
+}
+
 .resources-title {
   text-align: center;
   padding: 0.75rem 0.5rem 0.25rem;
