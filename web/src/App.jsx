@@ -51,6 +51,7 @@ export default function App() {
   }, []);
 
   const week = planData[weekIndex];
+  const progressPercentage = Math.round(((weekIndex + 1) / planData.length) * 100);
 
   return (
     <div className="container">
@@ -63,6 +64,7 @@ export default function App() {
         <h1 className="title">
           Bible Reading Plan
         </h1>
+        <p className="subtitle">Grow in faith with a guided weekly plan</p>
       </header>
       
       <main className="main">
@@ -76,7 +78,17 @@ export default function App() {
           </button>
           
           <div className="week-display">
-            Week of: <span className="week-highlight">{week.date}</span>
+            Week {weekIndex + 1} of {planData.length}
+            <span className="week-highlight">{week.date}</span>
+            <div className="progress-container">
+              <div 
+                className="progress-bar" 
+                style={{ width: `${progressPercentage}%` }}
+              ></div>
+            </div>
+            <div className="progress-text">
+              {progressPercentage}% Complete
+            </div>
           </div>
           
           <button
@@ -132,12 +144,12 @@ export default function App() {
           </div>
         </div>
         
-        <footer className="footer">
+        <div className="footer">
           {weekIndex === 0 
             ? 'Reading plan starts September 8, 2025' 
-            : `Week ${weekIndex + 1} of ${planData.length}`
+            : `Stay consistent in your daily reading journey!`
           }
-        </footer>
+        </div>
       </main>
       
       <footer className="resources-footer">
