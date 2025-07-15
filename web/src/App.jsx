@@ -44,14 +44,83 @@ const bibleResources = [
 
 export default function App() {
   const [weekIndex, setWeekIndex] = useState(0);
+  const [readingProgress, setReadingProgress] = useState({});
   
   useEffect(() => {
     const today = new Date();
     setWeekIndex(getCurrentWeekIndex(planData, today));
+    
+    // Load reading progress from localStorage
+    const savedProgress = localStorage.getItem('bibleReadingProgress');
+    if (savedProgress) {
+      setReadingProgress(JSON.parse(savedProgress));
+    }
   }, []);
 
   const week = planData[weekIndex];
   const progressPercentage = Math.round(((weekIndex + 1) / planData.length) * 100);
+
+  // Function to handle checkbox changes
+  const handleReadingCheck = (weekIndex, readingType, sectionIndex, chapterIndex = null) => {
+    const key = chapterIndex !== null 
+      ? `${weekIndex}-${readingType}-${sectionIndex}-${chapterIndex}`
+      : `${weekIndex}-${readingType}-${sectionIndex}`;
+    
+    const newProgress = {
+      ...readingProgress,
+      [key]: !readingProgress[key]
+    };
+    
+    setReadingProgress(newProgress);
+    localStorage.setItem('bibleReadingProgress', JSON.stringify(newProgress));
+  };
+
+  // Function to check if a reading is completed
+  const isReadingCompleted = (weekIndex, readingType, sectionIndex, chapterIndex = null) => {
+    const key = chapterIndex !== null 
+      ? `${weekIndex}-${readingType}-${sectionIndex}-${chapterIndex}`
+      : `${weekIndex}-${readingType}-${sectionIndex}`;
+    
+    return readingProgress[key] || false;
+  };
+
+  // Function to parse chapter ranges and get individual chapters
+  const parseChapterRange = (passage) => {
+    if (!passage) return [];
+    
+    // Handle ranges like "Matthew 1-2" or "Genesis 1-3"
+    const rangeMatch = passage.match(/^(.+?)\s+(\d+)-(\d+)$/);
+    if (rangeMatch) {
+      const [, book, start, end] = rangeMatch;
+      const chapters = [];
+      for (let i = parseInt(start); i <= parseInt(end); i++) {
+        chapters.push(`${book} ${i}`);
+      }
+      return { 
+        display: passage, 
+        chapters: chapters,
+        isRange: true 
+      };
+    }
+    
+    // Handle single chapters or other formats
+    return { 
+      display: passage, 
+      chapters: [passage],
+      isRange: false 
+    };
+  };
+
+  // Function to split passages into chapters
+  const getChapters = (passage) => {
+    if (!passage) return [];
+    // Split by semicolon first, then by comma if no semicolon
+    const sections = passage.includes(';') 
+      ? passage.split(';').map(ch => ch.trim())
+      : passage.split(',').map(ch => ch.trim());
+    
+    return sections.map(section => parseChapterRange(section));
+  };
 
   return (
     <div className="container">
@@ -105,42 +174,108 @@ export default function App() {
             <span className="reading-label">
               NT Reading
             </span>
-            <a 
-              href={passageLink(week.nt)} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="reading-link"
-            >
-              {week.nt}
-            </a>
+            <div className="reading-passages">
+              {getChapters(week.nt).map((section, sectionIndex) => (
+                <div key={sectionIndex} className="passage-item">
+                  <div className="reading-link-container">
+                    <a 
+                      href={passageLink(section.display)} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="reading-link"
+                    >
+                      {section.display}
+                    </a>
+                    <div className="chapter-checkboxes">
+                      {section.chapters.map((chapter, chapterIndex) => (
+                        <label key={chapterIndex} className="chapter-checkbox-label">
+                          <input
+                            type="checkbox"
+                            id={`nt-${weekIndex}-${sectionIndex}-${chapterIndex}`}
+                            checked={isReadingCompleted(weekIndex, 'nt', sectionIndex, chapterIndex)}
+                            onChange={() => handleReadingCheck(weekIndex, 'nt', sectionIndex, chapterIndex)}
+                            className="reading-checkbox"
+                          />
+                          <span className="chapter-number">Ch {chapterIndex + 1}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
           
           <div className="reading-item">
             <span className="reading-label">
               OT Connection
             </span>
-            <a 
-              href={passageLink(week.otConnection)} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="reading-link"
-            >
-              {week.otConnection}
-            </a>
+            <div className="reading-passages">
+              {getChapters(week.otConnection).map((section, sectionIndex) => (
+                <div key={sectionIndex} className="passage-item">
+                  <div className="reading-link-container">
+                    <a 
+                      href={passageLink(section.display)} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="reading-link"
+                    >
+                      {section.display}
+                    </a>
+                    <div className="chapter-checkboxes">
+                      {section.chapters.map((chapter, chapterIndex) => (
+                        <label key={chapterIndex} className="chapter-checkbox-label">
+                          <input
+                            type="checkbox"
+                            id={`otConnection-${weekIndex}-${sectionIndex}-${chapterIndex}`}
+                            checked={isReadingCompleted(weekIndex, 'otConnection', sectionIndex, chapterIndex)}
+                            onChange={() => handleReadingCheck(weekIndex, 'otConnection', sectionIndex, chapterIndex)}
+                            className="reading-checkbox"
+                          />
+                          <span className="chapter-number">Ch {chapterIndex + 1}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
           
           <div className="reading-item">
             <span className="reading-label">
               OT Reading
             </span>
-            <a 
-              href={passageLink(week.ot)} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="reading-link"
-            >
-              {week.ot}
-            </a>
+            <div className="reading-passages">
+              {getChapters(week.ot).map((section, sectionIndex) => (
+                <div key={sectionIndex} className="passage-item">
+                  <div className="reading-link-container">
+                    <a 
+                      href={passageLink(section.display)} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="reading-link"
+                    >
+                      {section.display}
+                    </a>
+                    <div className="chapter-checkboxes">
+                      {section.chapters.map((chapter, chapterIndex) => (
+                        <label key={chapterIndex} className="chapter-checkbox-label">
+                          <input
+                            type="checkbox"
+                            id={`ot-${weekIndex}-${sectionIndex}-${chapterIndex}`}
+                            checked={isReadingCompleted(weekIndex, 'ot', sectionIndex, chapterIndex)}
+                            onChange={() => handleReadingCheck(weekIndex, 'ot', sectionIndex, chapterIndex)}
+                            className="reading-checkbox"
+                          />
+                          <span className="chapter-number">Ch {chapterIndex + 1}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
         
@@ -171,43 +306,48 @@ export default function App() {
           ))}
         </ul>
         <div className="spiritual-discipline-section">
-          <h3 className="discipline-title">Bible Reading as a Spiritual Discipline</h3>
+          <h3 className="discipline-title">Bible Reading as Apprenticeship to Jesus</h3>
           <p className="discipline-text">
-            Bible reading is far more than an intellectual exercise—it is a sacred spiritual discipline 
-            that connects us with the living God. Through Scripture, the Holy Spirit speaks to our hearts, 
-            transforms our minds, and shapes our character to reflect Christ's image.
+            True discipleship is about learning to live like Jesus—not just knowing about Him, but becoming 
+            like Him. Bible reading is one of the most powerful spiritual disciplines for this transformation, 
+            as it allows us to <strong>be with Jesus</strong>, <strong>become like Jesus</strong>, and learn to 
+            <strong> do as Jesus did</strong>.
           </p>
           <p className="discipline-text">
-            <strong>Begin with Prayer:</strong> Always approach Scripture with a humble heart, asking the 
-            Holy Spirit to illuminate God's truth and reveal what He wants you to understand. Prayer prepares 
-            your heart to receive God's word and helps you listen with spiritual ears.
+            <strong>Be with Jesus:</strong> When we read Scripture, we're not just gathering information—we're 
+            entering into the presence of the living Word. Approach your Bible reading as sacred time with 
+            Jesus. Slow down, quiet your heart, and practice abiding in His presence. Let Scripture become 
+            a place where you meet with God, not merely a book to be studied.
           </p>
           <p className="discipline-text">
-            <strong>Read Meditatively:</strong> Don't rush through the text. Read slowly, allowing God's 
-            word to penetrate your heart. Consider reading the same passage multiple times, asking: "What 
-            is God saying to me through this text? How does this reveal God's character? What response does 
-            God desire from me?"
+            <strong>Become like Jesus:</strong> Scripture is God's primary tool for spiritual formation. 
+            As you read, pay attention to how Jesus lived, how He treated people, how He responded to 
+            challenges. Ask yourself: "How is the Spirit inviting me to become more like Jesus through 
+            this passage?" Let God's Word shape your character, values, and way of seeing the world.
           </p>
           <p className="discipline-text">
-            <strong>Journal and Reflect:</strong> Write down insights, questions, and applications. Record 
-            how God is speaking to you through His word. This practice helps you remember what you've learned 
-            and track your spiritual growth over time.
+            <strong>Do as Jesus Did:</strong> Jesus didn't just teach about love—He embodied it. As you 
+            read Scripture, look for practical ways to live out what you're learning. How can you extend 
+            mercy, practice forgiveness, serve others, or seek justice in your daily life? Scripture 
+            without application remains powerless to transform us.
           </p>
           <p className="discipline-text">
-            <strong>Apply What You Learn:</strong> Scripture reading without application is incomplete. Ask 
-            God to show you specific ways to live out what you've read. True spiritual growth happens when 
-            we align our lives with God's word and allow it to transform our thoughts, words, and actions.
+            <strong>Create Sacred Rhythms:</strong> Develop a sustainable rule of life that includes regular 
+            Scripture reading. This isn't about checking off a religious duty, but about creating space 
+            for God to form you. Start small—even five minutes of intentional Bible reading can become 
+            a powerful spiritual discipline when practiced consistently.
           </p>
           <p className="discipline-text">
-            <strong>Stay Consistent:</strong> Like any relationship, consistency deepens intimacy. Even if 
-            you can only read a few verses each day, maintain regular communion with God through His word. 
-            Remember that God desires to speak to you personally through Scripture—He has something special 
-            for you each day.
+            <strong>Practice Lectio Divina:</strong> Try reading Scripture slowly and prayerfully. Read 
+            a short passage three times: first for understanding, second for personal application, third 
+            for hearing God's invitation to you. This ancient practice helps us encounter God through 
+            His Word rather than just analyzing it.
           </p>
           <p className="discipline-text">
-            Building this discipline takes time and patience with yourself. Start where you are, be consistent, 
-            and trust the Holy Spirit to guide you. Over time, Bible reading will become not just a habit, 
-            but a cherished time of intimate fellowship with your heavenly Father.
+            Remember, spiritual formation is not about perfection but about apprenticeship. You're learning 
+            to follow Jesus in the way of love, and Scripture is your guide. Be patient with yourself, 
+            stay consistent, and trust that God is at work in you through His Word. This is how we grow 
+            from being merely believers to becoming true apprentices of Jesus.
           </p>
         </div>
       </footer>

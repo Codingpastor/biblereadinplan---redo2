@@ -299,7 +299,7 @@ body {
   box-shadow: var(--shadow-card);
   transition: var(--transition);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 1rem;
 }
 
@@ -317,25 +317,94 @@ body {
   flex-shrink: 0;
 }
 
+.reading-passages {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex-grow: 1;
+}
+
+.passage-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.reading-link-container {
+  display: flex;
+  align-items: center;
+  background: var(--surface-light);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border);
+  padding: 0.5rem 1rem;
+  flex-grow: 1;
+  transition: var(--transition);
+}
+
+.reading-link-container:hover {
+  background: var(--surface-hover);
+  border-color: var(--primary);
+}
+
 .reading-link {
-  display: inline-block;
   color: var(--text);
   text-decoration: none;
   font-weight: 500;
   font-size: 1rem;
   line-height: 1.5;
   transition: var(--transition);
-  padding: 0.5rem 1rem;
-  background: var(--surface-light);
-  border-radius: var(--border-radius);
-  border: 1px solid var(--border);
   flex-grow: 1;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 0;
 }
 
 .reading-link:hover {
   color: var(--primary);
-  background: var(--surface-hover);
-  border-color: var(--primary);
+}
+
+.reading-link:focus {
+  outline: none;
+}
+
+.reading-link:visited {
+  color: var(--text);
+}
+
+.reading-link:visited:hover {
+  color: var(--primary);
+}
+
+.chapter-checkboxes {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: auto;
+  padding-left: 1rem;
+}
+
+.chapter-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.chapter-number {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.reading-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--primary);
+  flex-shrink: 0;
 }
 
 /* Resources Section */
@@ -505,8 +574,17 @@ body {
 
 /* Focus States for Accessibility */
 .nav-button:focus,
-.reading-link:focus,
 .resource-link:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.reading-link:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.reading-checkbox:focus {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
