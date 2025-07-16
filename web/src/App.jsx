@@ -94,7 +94,10 @@ export default function App() {
       const [, book, start, end] = rangeMatch;
       const chapters = [];
       for (let i = parseInt(start); i <= parseInt(end); i++) {
-        chapters.push(`${book} ${i}`);
+        chapters.push({
+          reference: `${book} ${i}`,
+          chapterNumber: i
+        });
       }
       return { 
         display: passage, 
@@ -103,10 +106,27 @@ export default function App() {
       };
     }
     
-    // Handle single chapters or other formats
+    // Handle single chapters like "Genesis 3" or other formats
+    const singleChapterMatch = passage.match(/^(.+?)\s+(\d+)$/);
+    if (singleChapterMatch) {
+      const [, book, chapter] = singleChapterMatch;
+      return { 
+        display: passage, 
+        chapters: [{
+          reference: passage,
+          chapterNumber: parseInt(chapter)
+        }],
+        isRange: false 
+      };
+    }
+    
+    // Handle other formats (like "Psalm 1:1-6" or complex references)
     return { 
       display: passage, 
-      chapters: [passage],
+      chapters: [{
+        reference: passage,
+        chapterNumber: 1 // Default to 1 for complex references
+      }],
       isRange: false 
     };
   };
@@ -134,6 +154,16 @@ export default function App() {
           Bible Reading Plan
         </h1>
         <p className="subtitle">Grow in faith with a guided weekly plan</p>
+        <div className="pdf-link-container">
+          <a 
+            href="/Full 156 week plan KZMC.pdf" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="pdf-link"
+          >
+            📄 Download Full 156 Week Plan (PDF)
+          </a>
+        </div>
       </header>
       
       <main className="main">
@@ -196,7 +226,7 @@ export default function App() {
                             onChange={() => handleReadingCheck(weekIndex, 'nt', sectionIndex, chapterIndex)}
                             className="reading-checkbox"
                           />
-                          <span className="chapter-number">Ch {chapterIndex + 1}</span>
+                          <span className="chapter-number">Ch {chapter.chapterNumber}</span>
                         </label>
                       ))}
                     </div>
@@ -232,7 +262,7 @@ export default function App() {
                             onChange={() => handleReadingCheck(weekIndex, 'otConnection', sectionIndex, chapterIndex)}
                             className="reading-checkbox"
                           />
-                          <span className="chapter-number">Ch {chapterIndex + 1}</span>
+                          <span className="chapter-number">Ch {chapter.chapterNumber}</span>
                         </label>
                       ))}
                     </div>
@@ -268,7 +298,7 @@ export default function App() {
                             onChange={() => handleReadingCheck(weekIndex, 'ot', sectionIndex, chapterIndex)}
                             className="reading-checkbox"
                           />
-                          <span className="chapter-number">Ch {chapterIndex + 1}</span>
+                          <span className="chapter-number">Ch {chapter.chapterNumber}</span>
                         </label>
                       ))}
                     </div>

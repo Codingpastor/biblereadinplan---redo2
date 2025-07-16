@@ -339,6 +339,8 @@ body {
   padding: 0.5rem 1rem;
   flex-grow: 1;
   transition: var(--transition);
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .reading-link-container:hover {
@@ -358,6 +360,7 @@ body {
   background: none;
   border: none;
   border-radius: 0;
+  min-width: 0;
 }
 
 .reading-link:hover {
@@ -381,8 +384,7 @@ body {
   gap: 0.5rem;
   align-items: center;
   flex-shrink: 0;
-  margin-left: auto;
-  padding-left: 1rem;
+  flex-wrap: wrap;
 }
 
 .chapter-checkbox-label {
@@ -390,8 +392,9 @@ body {
   align-items: center;
   gap: 0.25rem;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--text-secondary);
+  white-space: nowrap;
 }
 
 .chapter-number {
@@ -400,11 +403,41 @@ body {
 }
 
 .reading-checkbox {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   cursor: pointer;
   accent-color: var(--primary);
   flex-shrink: 0;
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 768px) {
+  .reading-link-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+  
+  .reading-link {
+    width: 100%;
+    font-size: 0.9rem;
+  }
+  
+  .chapter-checkboxes {
+    align-self: stretch;
+    justify-content: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .chapter-checkbox-label {
+    font-size: 0.7rem;
+  }
+  
+  .reading-checkbox {
+    width: 16px;
+    height: 16px;
+  }
 }
 
 /* Resources Section */
@@ -509,6 +542,39 @@ body {
 .discipline-text strong {
   color: var(--primary);
   font-weight: 600;
+}
+
+/* PDF Link Styling */
+.pdf-link-container {
+  margin-top: 1rem;
+}
+
+.pdf-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--primary);
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+  box-shadow: var(--shadow-card);
+}
+
+.pdf-link:hover {
+  background: var(--primary);
+  color: var(--surface);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.pdf-link:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 /* Responsive Design */
