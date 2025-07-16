@@ -3,6 +3,26 @@ import './App.css';
 import planData from './reading-plan-with-dates';
 import logo from './logo.png';
 
+// Bible book chapter counts
+const bookChapterCounts = {
+  // Old Testament
+  'Genesis': 50, 'Exodus': 40, 'Leviticus': 27, 'Numbers': 36, 'Deuteronomy': 34,
+  'Joshua': 24, 'Judges': 21, 'Ruth': 4, '1 Samuel': 31, '2 Samuel': 24,
+  '1 Kings': 22, '2 Kings': 25, '1 Chronicles': 29, '2 Chronicles': 36, 'Ezra': 10,
+  'Nehemiah': 13, 'Esther': 10, 'Job': 42, 'Psalms': 150, 'Proverbs': 31,
+  'Ecclesiastes': 12, 'Song of Solomon': 8, 'Song of Songs': 8, 'Isaiah': 66, 'Jeremiah': 52,
+  'Lamentations': 5, 'Ezekiel': 48, 'Daniel': 12, 'Hosea': 14, 'Joel': 3,
+  'Amos': 9, 'Obadiah': 1, 'Jonah': 4, 'Micah': 7, 'Nahum': 3,
+  'Habakkuk': 3, 'Zephaniah': 3, 'Haggai': 2, 'Zechariah': 14, 'Malachi': 4,
+  // New Testament
+  'Matthew': 28, 'Mark': 16, 'Luke': 24, 'John': 21, 'Acts': 28,
+  'Romans': 16, '1 Corinthians': 16, '2 Corinthians': 13, 'Galatians': 6, 'Ephesians': 6,
+  'Philippians': 4, 'Colossians': 4, '1 Thessalonians': 5, '2 Thessalonians': 3, '1 Timothy': 6,
+  '2 Timothy': 4, 'Titus': 3, 'Philemon': 1, 'Hebrews': 13, 'James': 5,
+  '1 Peter': 5, '2 Peter': 3, '1 John': 5, '2 John': 1, '3 John': 1,
+  'Jude': 1, 'Revelation': 22
+};
+
 function passageLink(passage) {
   if (!passage) return null;
   // Remove extra spaces, replace ' - ' with '-', handle commas, ensure space after semicolons
@@ -88,7 +108,48 @@ export default function App() {
   const parseChapterRange = (passage) => {
     if (!passage) return [];
     
-    // Handle ranges like "Matthew 1-2" or "Genesis 1-3"
+    // Handle cross-book ranges like "Genesis 49-Exodus 4"
+    const crossBookMatch = passage.match(/^(.+?)\s+(\d+)-(.+?)\s+(\d+)$/);
+    if (crossBookMatch) {
+      const [, firstBook, firstChapter, secondBook, secondChapter] = crossBookMatch;
+      const chapters = [];
+      
+      const firstBookChapterCount = bookChapterCounts[firstBook];
+      const firstChapterNum = parseInt(firstChapter);
+      const secondChapterNum = parseInt(secondChapter);
+      
+      // Add remaining chapters from the first book (from firstChapter to end of book)
+      if (firstBookChapterCount) {
+        for (let i = firstChapterNum; i <= firstBookChapterCount; i++) {
+          chapters.push({
+            reference: `${firstBook} ${i}`,
+            chapterNumber: i
+          });
+        }
+      } else {
+        // Fallback if book not found
+        chapters.push({
+          reference: `${firstBook} ${firstChapter}`,
+          chapterNumber: firstChapterNum
+        });
+      }
+      
+      // Add chapters from the second book (from 1 to secondChapter)
+      for (let i = 1; i <= secondChapterNum; i++) {
+        chapters.push({
+          reference: `${secondBook} ${i}`,
+          chapterNumber: i
+        });
+      }
+      
+      return { 
+        display: passage, 
+        chapters: chapters,
+        isRange: true 
+      };
+    }
+    
+    // Handle same-book ranges like "Matthew 1-2" or "Genesis 1-3"
     const rangeMatch = passage.match(/^(.+?)\s+(\d+)-(\d+)$/);
     if (rangeMatch) {
       const [, book, start, end] = rangeMatch;
@@ -134,10 +195,28 @@ export default function App() {
   // Function to split passages into chapters
   const getChapters = (passage) => {
     if (!passage) return [];
+    
+    // First, normalize the passage to handle different separators
+    let normalizedPassage = passage;
+    
+    // Handle cases like "Mark 16 Luke 1" - replace space between book references with semicolon
+    // This regex looks for: digit + space + capital letter + lowercase letter(s) (indicating a new book name)
+    // This prevents breaking "1 Samuel 2" while still catching "Mark 16 Luke 1"
+    normalizedPassage = normalizedPassage.replace(/(\d+)\s+([A-Z][a-z]+)/g, (match, digit, bookStart) => {
+      // Don't split if this looks like a numbered book (1 Samuel, 2 Kings, etc.)
+      if (normalizedPassage.includes(digit + ' ' + bookStart) && 
+          (bookStart === 'Samuel' || bookStart === 'Kings' || bookStart === 'Chronicles' || 
+           bookStart === 'Corinthians' || bookStart === 'Thessalonians' || bookStart === 'Timothy' || 
+           bookStart === 'Peter' || bookStart === 'John')) {
+        return match; // Keep as is
+      }
+      return digit + '; ' + bookStart;
+    });
+    
     // Split by semicolon first, then by comma if no semicolon
-    const sections = passage.includes(';') 
-      ? passage.split(';').map(ch => ch.trim())
-      : passage.split(',').map(ch => ch.trim());
+    const sections = normalizedPassage.includes(';') 
+      ? normalizedPassage.split(';').map(ch => ch.trim())
+      : normalizedPassage.split(',').map(ch => ch.trim());
     
     return sections.map(section => parseChapterRange(section));
   };
