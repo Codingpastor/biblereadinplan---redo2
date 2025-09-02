@@ -39,7 +39,7 @@ function passageLink(passage) {
 
 function getCurrentWeekIndex(plan, today) {
   const releaseDate = new Date('2025-09-08');
-  if (today < releaseDate) return 0;
+  if (today < releaseDate) return -1; // Return -1 to indicate plan hasn't started
   for (let i = plan.length - 1; i >= 0; i--) {
     if (today >= new Date(plan[i].date)) return i;
   }
@@ -68,7 +68,8 @@ export default function App() {
   
   useEffect(() => {
     const today = new Date();
-    setWeekIndex(getCurrentWeekIndex(planData, today));
+    const currentWeek = getCurrentWeekIndex(planData, today);
+    setWeekIndex(currentWeek === -1 ? 0 : currentWeek); // Show week 0 if plan hasn't started
     
     // Load reading progress from localStorage
     const savedProgress = localStorage.getItem('bibleReadingProgress');
@@ -77,6 +78,8 @@ export default function App() {
     }
   }, []);
 
+  const today = new Date();
+  const planStarted = today >= new Date('2025-09-08');
   const week = planData[weekIndex];
   const progressPercentage = Math.round(((weekIndex + 1) / planData.length) * 100);
 
@@ -249,7 +252,7 @@ export default function App() {
         <div className="navigation">
           <button
             onClick={() => setWeekIndex(i => Math.max(0, i - 1))}
-            disabled={weekIndex === 0}
+            disabled={!planStarted || weekIndex === 0}
             className="nav-button"
           >
             Previous
@@ -261,17 +264,17 @@ export default function App() {
             <div className="progress-container">
               <div 
                 className="progress-bar" 
-                style={{ width: `${progressPercentage}%` }}
+                style={{ width: `${planStarted ? progressPercentage : 0}%` }}
               ></div>
             </div>
             <div className="progress-text">
-              {progressPercentage}% Complete
+              {planStarted ? `${progressPercentage}% Complete` : 'Not Started'}
             </div>
           </div>
           
           <button
             onClick={() => setWeekIndex(i => Math.min(planData.length - 1, i + 1))}
-            disabled={weekIndex === planData.length - 1}
+            disabled={!planStarted || weekIndex === planData.length - 1}
             className="nav-button"
           >
             Next
@@ -303,6 +306,7 @@ export default function App() {
                             id={`nt-${weekIndex}-${sectionIndex}-${chapterIndex}`}
                             checked={isReadingCompleted(weekIndex, 'nt', sectionIndex, chapterIndex)}
                             onChange={() => handleReadingCheck(weekIndex, 'nt', sectionIndex, chapterIndex)}
+                            disabled={!planStarted}
                             className="reading-checkbox"
                           />
                           <span className="chapter-number">Ch {chapter.chapterNumber}</span>
@@ -339,6 +343,7 @@ export default function App() {
                             id={`otConnection-${weekIndex}-${sectionIndex}-${chapterIndex}`}
                             checked={isReadingCompleted(weekIndex, 'otConnection', sectionIndex, chapterIndex)}
                             onChange={() => handleReadingCheck(weekIndex, 'otConnection', sectionIndex, chapterIndex)}
+                            disabled={!planStarted}
                             className="reading-checkbox"
                           />
                           <span className="chapter-number">Ch {chapter.chapterNumber}</span>
@@ -375,6 +380,7 @@ export default function App() {
                             id={`ot-${weekIndex}-${sectionIndex}-${chapterIndex}`}
                             checked={isReadingCompleted(weekIndex, 'ot', sectionIndex, chapterIndex)}
                             onChange={() => handleReadingCheck(weekIndex, 'ot', sectionIndex, chapterIndex)}
+                            disabled={!planStarted}
                             className="reading-checkbox"
                           />
                           <span className="chapter-number">Ch {chapter.chapterNumber}</span>
@@ -389,7 +395,7 @@ export default function App() {
         </div>
         
         <div className="footer">
-          {weekIndex === 0 
+          {!planStarted 
             ? 'Reading plan starts September 8, 2025' 
             : `Stay consistent in your daily reading journey!`
           }
