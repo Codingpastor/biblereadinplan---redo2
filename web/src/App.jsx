@@ -245,15 +245,19 @@ export default function App() {
               xmlns="http://www.w3.org/2000/svg"
             >
               <path 
-                d="M10 25 Q30 10, 70 25 Q75 28, 80 35 L75 40 Q70 35, 65 32" 
+                d="M10 25 Q30 10, 70 25 Q75 28, 80 35" 
                 stroke="#FFD700" 
                 strokeWidth="3" 
                 fill="none"
                 strokeLinecap="round"
+                strokeLinejoin="round"
               />
-              <polygon 
-                points="75,32 85,25 75,40" 
-                fill="#FFD700"
+              <path 
+                d="M72 32 L80 42 M88 32 L80 42" 
+                stroke="#FFD700" 
+                strokeWidth="3"
+                strokeLinecap="round"
+                fill="none"
               />
             </svg>
           </div>
@@ -317,8 +321,10 @@ export default function App() {
                       target="_blank" 
                       rel="noopener noreferrer" 
                       className="reading-link"
+                      title="Click to read on Bible Gateway"
                     >
                       {section.display}
+                      <i className="fas fa-external-link-alt reading-link-icon"></i>
                     </a>
                     <div className="chapter-checkboxes">
                       {section.chapters.map((chapter, chapterIndex) => (
@@ -353,8 +359,10 @@ export default function App() {
                       target="_blank" 
                       rel="noopener noreferrer" 
                       className="reading-link"
+                      title="Click to read on Bible Gateway"
                     >
                       {section.display}
+                      <i className="fas fa-external-link-alt reading-link-icon"></i>
                     </a>
                     <div className="chapter-checkboxes">
                       {section.chapters.map((chapter, chapterIndex) => (
@@ -389,8 +397,10 @@ export default function App() {
                       target="_blank" 
                       rel="noopener noreferrer" 
                       className="reading-link"
+                      title="Click to read on Bible Gateway"
                     >
                       {section.display}
+                      <i className="fas fa-external-link-alt reading-link-icon"></i>
                     </a>
                     <div className="chapter-checkboxes">
                       {section.chapters.map((chapter, chapterIndex) => (
