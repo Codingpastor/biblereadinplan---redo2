@@ -236,6 +236,28 @@ export default function App() {
           Bible Reading Plan
         </h1>
         <p className="subtitle">Grow in faith with a guided weekly plan</p>
+        <div className="arrow-container">
+          <div className="download-arrow">
+            <span className="arrow-text">Get the full plan!</span>
+            <svg 
+              className="arrow-svg" 
+              viewBox="0 0 100 50" 
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path 
+                d="M10 25 Q30 10, 70 25 Q75 28, 80 35 L75 40 Q70 35, 65 32" 
+                stroke="#FFD700" 
+                strokeWidth="3" 
+                fill="none"
+                strokeLinecap="round"
+              />
+              <polygon 
+                points="75,32 85,25 75,40" 
+                fill="#FFD700"
+              />
+            </svg>
+          </div>
+        </div>
         <div className="pdf-link-container">
           <a 
             href="/Full 156 week plan KZMC.pdf" 
