@@ -452,7 +452,7 @@ export default function App() {
         <div className="spiritual-discipline-section">
           <h3 className="discipline-title">Bible Reading as Apprenticeship to Jesus</h3>
           <p className="discipline-text">
-            True discipleship is about learning to live like Jesus—not just knowing about Him, but becoming 
+            True discipleship is all about learning to live like Jesus—not just knowing about Him, but becoming 
             like Him. Bible reading is one of the most powerful spiritual disciplines for this transformation, 
             as it allows us to <strong>be with Jesus</strong>, <strong>become like Jesus</strong>, and learn to 
             <strong> do as Jesus did</strong>.
